@@ -35,3 +35,15 @@ data Maybe a = Nothing | Just a
 実はリスト型は型コンストラクタの一種。`[Int]`型の値、`[Char]`型の値、などはありますが、`[]`型の値というのは作れない。
 
 `Nothing`の型が`Maybe a`であることに注意。この型は型引数がある、つまりMaybe aのaがあるので __多相的(polymorphic)__ である。
+
+# 型シノニム
+
+型シノニム(型同義名)そのものは特に何もしない。ある型に別の名前を与えて、コードやドキュメントを他の人が読みやすくするだけ。
+
+```
+type PhoneNumber = String
+type Name = String
+type PhoneBook = [(Name, PhoneNumber)]
+```
+
+Haskellプログラマは、自分のプログラムの中で使っている文字列について「ただの文字列じゃなくて実際はこれを表しているんだよ」という情報を伝えたいとき、Stringに型シノニムを与える。
