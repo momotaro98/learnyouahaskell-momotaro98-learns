@@ -26,3 +26,15 @@ treeElem x (Node a left right)
 *Main> numTree 
 Node 2 EmptyTree (Node 9 (Node 5 (Node 3 EmptyTree EmptyTree) (Node 8 EmptyTree EmptyTree)) EmptyTree)
 -}
+
+instance Functor Tree where
+    fmap f EmptyTree = EmptyTree
+    fmap f (Node x left right) = Node (f x) (fmap f left) (fmap f right)
+
+{-
+*Main> let myTree = foldr treeInsert EmptyTree [5,7,3]
+*Main> myTree 
+Node 3 EmptyTree (Node 7 (Node 5 EmptyTree EmptyTree) EmptyTree)
+*Main> fmap (*4) myTree 
+Node 12 EmptyTree (Node 28 (Node 20 EmptyTree EmptyTree) EmptyTree)
+-}

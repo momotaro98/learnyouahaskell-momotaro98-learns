@@ -90,3 +90,74 @@ instance (Eq m) => Eq (Maybe m) where
 
 Maybeは型引数を1つ取って具体型を生み出す型コンストラクタ。`(Maybe m)`が型であり、インスタンス定義ではmを型の変数として扱うことができる。
 このとき、そのmは`(==)`関数で比較されるべきなので`(Eq m) =>`として型制約をつけている。
+
+# Functor型クラス
+
+## List
+
+Functorという型クラスを見ていこう。Functorは、**全体を写せる(map over)**ものの型クラスである。
+リストのmapは何かを写す(map over)操作の典型例でリストはFunctor型クラスに属している。
+
+Functor型クラスの実装は以下。
+
+```
+class Functor f where
+    fmap :: (a -> b) -> f a -> a b
+```
+
+Functorは1つの関数fmapを持っており、デフォルト実装は提供していない。
+Eq型クラスが`(==) :: (Eq a) => a -> a -> Bool`におけるaのようにすべて具体型であるのに対し、Functorのfは具体型ではないく、1つの型引数を取る型コンストラクタである。
+fmapは「ある型aから別の型bへの関数」と「ある型aに適用されたファンクター値」を取り、「別の型bのほうに適用されたファンクター値」を返す関数。
+
+map関数の型シグネチャを思い出そう。
+
+```
+map :: (a -> b) -> [a] -> [b]
+```
+
+**mapというのはリスト限定で動作するfmap**に過ぎない。リストに対するFunctorインスタンス宣言は以下。
+
+```
+instance Functor [] where
+    fmap = map
+```
+
+`[]`は空のリストにではなく、リストを意味する型コンストラクタ。
+
+```
+Prelude> fmap (*2) [1..3]
+[2,4,6]
+Prelude> map (*2) [1..3]
+[2,4,6]
+```
+
+## Maybe
+
+Maybeもファンクターであり、以下のようになっている。
+
+```
+instance Functor Maybe where
+    fmap f (Just x) = Just (f x)
+    fmap f Nothing = Nothing
+```
+
+Maybeも型引数を1つ取る型コンストラクタなので`instance Functor Maybe where`とそのまま記述する。
+> Ikeda note: `fmap f (Just x)`がの`f`がファンクター型コンストラクタの`f`と被って見えてややこしいが、これは`(a -> b)`の関数。
+
+```
+Prelude> fmap (*2) (Just 200)
+Just 400
+Prelude> fmap (*2) Nothing
+Nothing
+```
+
+## Either
+
+```
+instance Functor (Either a) where
+    fmap f (Right x) = Right (f x)
+    fmap f (Left x) = Left x
+```
+
+Eitherの定義`data Either a b = Left a b`を見ると、`Either a`は型引数1つを取る型コンストラクタとなれるのでこれがFunctor型クラスのインスタンスになれる。
+Leftにはfが適用されていないのは、fが`a -> b`でaを引数に取る関数であり、Eitherの定義からもわかるようにaとbは異なる型なので、fでa,b両方とも適用できてしまっては定義と矛盾してしまう。また、fmapがEither a bに作用したときの型を見ても、2つ目の引数は変化してもよいが、1つ目の引数は不変でないとまずいことが分かる(1つ目はエラーメッセージであったりする)。
