@@ -102,7 +102,7 @@ Functor型クラスの実装は以下。
 
 ```
 class Functor f where
-    fmap :: (a -> b) -> f a -> a b
+    fmap :: (a -> b) -> f a -> f b
 ```
 
 Functorは1つの関数fmapを持っており、デフォルト実装は提供していない。
